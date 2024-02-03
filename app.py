@@ -3,7 +3,7 @@ from flask_migrate import Migrate
 from variables import conexion
 from dotenv import load_dotenv
 # os > operating system
-from os import environ # llama a .env y sus variables
+from os import environ
 from models import *
 from controllers import *
 from flask_restful import Api
