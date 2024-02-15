@@ -4,6 +4,7 @@ from models import Barman
 from dtos import RegistrarBarmanDTO, LoginBarmanDTO
 from bcrypt import gensalt, hashpw, checkpw
 from flask_jwt_extended import create_access_token
+from datetime import timedelta
 
 
 class BarmanController(Resource):
@@ -39,6 +40,9 @@ class BarmanController(Resource):
 
 class LoginController(Resource):
     def post(self):
+        """
+        file: loginBarman.yml
+        """
         dto = LoginBarmanDTO()
         try:
             data_validada = dto.load(request.get_json())
@@ -57,8 +61,9 @@ class LoginController(Resource):
 
             # identity > sirve para indicar a que usuario le pertenece esa token
             token = create_access_token(identity=barman_encontrado.id, additional_claims={
-                'nombre': barman_encontrado.nombre
-            })
+                'nombre': barman_encontrado.nombre,
+                'tipo': 'Barman'
+            }, expires_delta=timedelta(hours=8))
             return {
                 'message': 'Bienvenido',
                 'content': token

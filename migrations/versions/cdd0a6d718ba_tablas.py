@@ -1,8 +1,8 @@
-"""creacion de tablas
+"""tablas
 
-Revision ID: b75e8ccfc016
+Revision ID: cdd0a6d718ba
 Revises: 
-Create Date: 2024-02-02 21:13:31.001834
+Create Date: 2024-02-08 19:19:22.999417
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'b75e8ccfc016'
+revision = 'cdd0a6d718ba'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -46,7 +46,7 @@ def upgrade():
     sa.Column('fecha_creacion', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('estado', sa.Enum('ATENTIDO', 'EN_ESPERA', 'PREPARANDO', 'PREPARADO', name='estadopedidosenum'), nullable=True),
     sa.Column('invitado_id', sa.Integer(), nullable=False),
-    sa.Column('barman_id', sa.Integer(), nullable=False),
+    sa.Column('barman_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['barman_id'], ['barmans.id'], ),
     sa.ForeignKeyConstraint(['invitado_id'], ['invitados.id'], ),
     sa.PrimaryKeyConstraint('id')
