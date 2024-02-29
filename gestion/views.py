@@ -2,15 +2,21 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import Plato, Ingrediente
+from .models import Plato, Ingrediente, Cheff
 from .serializers import (PlatoSerializer,
                           IngredienteSerializer,
                           PreparacionSerializer,
-                          PlatoConIngredientesYPreparacionesSerializer)
+                          PlatoConIngredientesYPreparacionesSerializer,
+                          RegistroCheffSerializer)
 from rest_framework import status
 from os import remove
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+# IsAdminUser > verificara si el usuario que envia la token es un ususario de tipo admin (is_superuser = True) y lo permitira hacer todo
+# IsAuthenticated > verificara si hay una token en la peticion, no interesara que privilegios tenga ese usuario
+# IsAuthenticatedOrReadOnly > si es un get o un options no necesita enviar una token pero si es un POST, PUT, DELETE si no manda la token no le permitira hacer la operacion
+# AllowAny > permite acceder a los recursos con o sin token
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 
 
 def vistaPrueba(request):
@@ -42,6 +48,7 @@ def controlladorInicial(request):
 
 
 class PlatosController(APIView):
+    permission_classes=[IsAuthenticatedOrReadOnly,]
     def get(self, request):
         # SELECT * FROM platos
         resultado = Plato.objects.all()
@@ -55,7 +62,12 @@ class PlatosController(APIView):
         })
 
     def post(self, request):
-        print(request.data)
+        # instancia del usuario que esta haciendo la peticion y si no hay devolvera None
+        print(request.user)
+        # el metodo por el cual esta mandando la autorizadion osea la JWT
+        print(request.auth)
+        # agregamos una nueva propiedad a una data que seria el id del cheff
+        request.data['cheffId']= request.user.id
         serializador = PlatoSerializer(data=request.data)
         # valida si la informacion enviada por el cliente es correcta o no, devolvera un Boolean
         validacion = serializador.is_valid()
@@ -74,6 +86,7 @@ class PlatosController(APIView):
 
 
 class PlatoController(APIView):
+    permission_classes=[IsAuthenticatedOrReadOnly,]
     def get(self, request, id):
         plato_encontrado = Plato.objects.filter(id=id).first()
         if not plato_encontrado:
@@ -135,9 +148,23 @@ class PlatoController(APIView):
 
 
 class IngredientesController(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request):
+        cheff = request.user
         serializador = IngredienteSerializer(data=request.data)
+        # request.data > {descripcion: '100gr de azucar',platoId:10}
         if serializador.is_valid():
+            # buscar si el plato le pertenece a este cheff, sino no permitir el guardado
+            # al momento de hacer la validacion con el serializador ya me devuelve el plato
+            plato_encontrado=serializador.validated_data.get('platoId')
+            # el plato_encontrado al momento de utilizar su cheffId retorna toda la informacion del cheff y no solo su id
+            if plato_encontrado.cheffId and plato_encontrado.cheffId.id != cheff.id:
+                # el cheff no es el propietario de ese plato
+                return Response(data={
+                    'message': 'No tienes acceso para modificar esta receta'
+                }, status=status.HTTP_401_UNAUTHORIZED)
+                
             serializador.save()
 
             return Response({
@@ -238,4 +265,26 @@ def buscarRecetas(request):
     else:
         return Response(data={
             'message': 'Falta el nombre en el query param'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(http_method_names=['POST'])
+def crearCheff(request):
+    serializador = RegistroCheffSerializer(data=request.data)
+    if serializador.is_valid():
+        nuevo_cheff = Cheff(nombre=serializador.validated_data.get('nombre'),
+                            correo=serializador.validated_data.get('correo'))
+        # set_password > sirve para generar el hash de nuestra password
+        nuevo_cheff.set_password(serializador.validated_data.get('password'))
+        nuevo_cheff.save()
+        print(request.data.get('correo'))
+
+        return Response(data={
+            'message': 'cheff creado exitosamente',
+            'content': serializador.data
+        }, status=status.HTTP_201_CREATED)
+    else:
+        return Response(data={
+            'message': 'Error al crear el cheff',
+            'content': serializador.errors
         }, status=status.HTTP_400_BAD_REQUEST)

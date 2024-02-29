@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -40,7 +41,8 @@ INSTALLED_APPS = [
     # cada vez que creamos o agregamos una aplicacion al proyecto esta se agregue en esta seccion sino django no la reconocera
     'gestion',
     'rest_framework',
-    'drf_yasg'
+    'drf_yasg',
+    'rest_framework_simplejwt'
 ]
 
 MIDDLEWARE = [
@@ -134,12 +136,29 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = BASE_DIR / 'archivos'
 
 # variable que servira para indicar la ruta de nuestros archivos declarados en la variable MEDIA_ROOT
-# si no quieren colocar 
+# si no quieren colocar un prefijo en el archivo coloquen el '/'
 MEDIA_URL = '/'
 
-# es todo lo relacionado con la libreria drf-yasg
-# https://drf-yasg.readthedocs.io/en/stable/settings.html 
-SWAGGER_SETTINGS={
+# es todo lo relacionado con la libreria de drf-yasg
+# https://drf-yasg.readthedocs.io/en/stable/settings.html
+SWAGGER_SETTINGS = {
     # cargar la informacion del ejemplo por defecto sin la necesidad de hacer click
     'DEFAULT_MODEL_RENDERING': 'example'
+}
+
+# indicar si cambiamos el auth_user a uno nuevo
+AUTH_USER_MODEL = 'gestion.Cheff'
+
+# Modificar las configuraciones de mi Django Rest Framework
+REST_FRAMEWORK = {
+    # Sirve para indicar a DRF que ahora la autenticacion la realizara mediante la nueva libreria agregada
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+
+
+SIMPLE_JWT ={
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1, minutes=30)
 }
