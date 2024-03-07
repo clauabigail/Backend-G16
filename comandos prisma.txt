@@ -1,0 +1,4 @@
+npx prisma init             > inicializa el proyecto para usar prisma
+npx prisma migrate dev      > crea una nueva migracion, pero tambien se puede utilizar para generar nuestro cliente de prisma (cuando creamos migraciones manuales)
+npx prisma migrate dev --       > falta completar......
+npx prisma migrate deploy   > efectua las migraciones faltantes en la base de datos
