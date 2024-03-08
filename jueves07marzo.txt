@@ -1,0 +1,45 @@
+nvs use latest
+npm i async-handler
+npm i express-async-handler
+npm uninstall async-handler
+npm run start:dev
+npx prisma generate
+npm i joi
+npm run start:dev
+        Probar en postman > 127.0.0.1:3000/categoria
+        {
+             "nombre": "pizzas"
+        }
+
+        Resultado>
+        {
+            "message": "Categoria creada exitosamente",
+            "content": {
+                "id": "4ebc4e2b-022a-4e00-b001-ae9c8bd62f0d",
+                "nombre": "pizzas"
+            }
+        }
+
+  nvs use latest  
+  npx prisma generate   
+  npm run prisma:migrate:save
+  npm run start:dev 
+
+        postman
+        {
+            "nombre": "Claudia",
+            "apellido":"Abril",
+            "correo":"clauabigail@gmail.com",
+            "password":"Welcome123",
+            "tipoUsuario":"ADMIN"
+        }
+
+
+
+
+// para formatear Prisma:
+npx prisma format
+
+
+npm i jsonwebtoken
+npm i --save-dev @types/jsonwebtoken

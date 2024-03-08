@@ -50,3 +50,17 @@ Para leer archivos .env   en el archivo package.json < sripcts se modifico "star
 https://nodejs.org/en/blog/release/v20.6.0
 
 npx prisma init
+
+*********************
+
+PARA EJECUTAR LA MIGRACION>
+    npm run prisma:migrate:save
+    nombre> creacion_de_tablas
+Luego en nuestro archivo package.json añadimos el codigo > "prisma:migrate:run": "prisma migrate deploy --preview-feature"
+    npm run prisma:migrate:run
+
+
+    npm i joi
+
+
+

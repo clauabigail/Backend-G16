@@ -1,9 +1,14 @@
 import express from 'express'
+import * as Rutas from './router/index.js'
 
 const servidor = express()
 
 servidor.use(express.json())
 
-servidor.listen(process.env.PORT. ()=>{
-    console.log(`Servidor corriendo `)
+//Cuando queremos agregar un conjunto de rutas a nuestra aplicacion utilizamos el middleware `use` que indicara las subrutas disponibles
+servidor.use(Rutas.categoriaRouter)
+servidor.use(Rutas.usuarioRouter)
+
+servidor.listen(process.env.PORT, () => {
+    console.log(`Servidor corriendo exitosamente en el puerto ${process.env.PORT}`)
 })
