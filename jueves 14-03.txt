@@ -1,0 +1,5 @@
+Hicimos cambios en el modelo de la tabla detalle_pedidos
+@@map
+
+    npm run prisma:migrate:save 
+    √ Enter a name for the new migration: ... renombrar_tabla_detalle_pedidos

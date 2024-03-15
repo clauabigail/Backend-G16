@@ -32,35 +32,35 @@ export const registro = async (req, res) => {
 
 }
 
-export const login = async (req, res)=>{
+export const login = async (req, res) => {
     const validacion = loginUsuario.validate(req.body)
 
-    if(validacion.error){
+    if (validacion.error) {
         return res.status(400).json({
-            message: 'Error al hacer login',
+            message: 'Error al hacer el login',
             content: validacion.error
         })
     }
 
-    // hacemos esta destructuracion para poder manejar las propiedades de una manera mas corta
-    const {correo, password} = validacion.value
+    // hacemos esta destructuracion para poder manejar las propiedas de una manera mas corta
+    const { correo, password } = validacion.value
     // buscamos al usuario por su correo
-    const usuarioEncontrado = await conexion.usuario.findUniqueOrThrow({ where:{ correo }})
+    const usuarioEncontrado = await conexion.usuario.findUniqueOrThrow({ where: { correo } })
 
     // validamos la password
     const esLaPassword = await bcryptjs.compare(password, usuarioEncontrado.password)
-    if (esLaPassword){
+    if (esLaPassword) {
         // generar la token de acceso
         // sign > firmar > sirve para crear una nueva token
-        // expiresIn > un numero o String, si le pasamos un numero este sera el calor en segundos y si le pasamos un string este puede ser de los siguientes formatos '1 day' / '10 days' / '1h' / '24h' /  '15d'
-        const token = jwt.sign({usuarioId: usuarioEncontrado.id, tipo: usuarioEncontrado.tipoUsuario}, process.env.JWT_SECRET_KEY, {expiresIn: '8h'})
+        // expiresIn > un numero o un string, si le pasamos un numero este sera el valor en segundos y si le pasamos un string este puede ser de los siguientes formatos '1 day' | '10 days' | '1h' | '24h' | '15d'
+        const token = jwt.sign({ usuarioId: usuarioEncontrado.id, tipo: usuarioEncontrado.tipoUsuario }, process.env.JWT_SECRET_KEY, { expiresIn: '8h' })
         return res.json({
-            message:'Bienvenido'
+            message: 'Bienvenido',
+            content: token
         })
-
-    }else {
-        return res.status(200).json({
-            message:'Credenciales incorrectas'
+    } else {
+        return res.status(400).json({
+            message: 'Credenciales incorrectas'
         })
     }
 }
